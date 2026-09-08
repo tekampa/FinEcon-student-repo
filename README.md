@@ -1,6 +1,6 @@
 # FinEcon Student Repo
 
-Starter R scripts and data for ECON 3025 (Financial Economics).
+This repository has guides and code to complement course material for ECON 3025 (Financial Economics).
 
 ## Setup (do this once)
 
@@ -10,18 +10,17 @@ Starter R scripts and data for ECON 3025 (Financial Economics).
    install.packages(c("tidyverse", "here", "scales", "assertthat"))
    ```
 3. **Open the project so R's working directory is inside the repo.** Pick one:
-   - **RStudio (recommended):** double-click `FinEcon-student-repo.Rproj`. RStudio
+   - **VS Code (recommended):** open the `FinEcon-student-repo` folder as your workspace.
+   - **RStudio:** double-click `FinEcon-student-repo.Rproj`. RStudio
      opens with the working directory set to the repo root automatically.
-   - **VS Code:** open the `FinEcon-student-repo` folder as your workspace.
    - **Plain R / terminal:** start R from inside the repo folder.
 
-That's it — every script uses the [`here`](https://here.r-lib.org) package to find
+With that set, every script uses the [`here`](https://here.r-lib.org) package to find
 files relative to the repo root, so paths work no matter which sub-folder you run
 from. You never edit file paths.
 
 > If you get `Error: Could not find associated project...`, your R session started
-> **outside** the repo. Reopen via the `.Rproj` (or set the working directory into
-> the repo) and re-run.
+> **outside** the repo. Reopen via opening the folder first in VS Code or the `.Rproj` and re-run.
 
 ## Layout
 

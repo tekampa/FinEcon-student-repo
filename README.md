@@ -10,7 +10,7 @@ This repository has guides and code to complement course material for ECON 3025 
    install.packages(c("tidyverse", "here", "scales", "assertthat"))
    ```
 3. **Open the project so R's working directory is inside the repo.** Pick one:
-   - **VS Code (recommended):** open the `FinEcon-student-repo` folder as your workspace. Follow the instructions [here](https://github.com/tekampa/hrefss-student-repo/blob/main/guides/vscode-copilot-setup.md) to VS Code with R and GitHub Copilot.
+   - **VS Code (recommended):** open the `FinEcon-student-repo` folder as your workspace. Follow the instructions [here](https://github.com/tekampa/hrefss-student-repo/blob/main/guides/vscode-copilot-setup.md) to set up VS Code with R and GitHub Copilot.
    - **RStudio:** double-click `FinEcon-student-repo.Rproj`. RStudio
      opens with the working directory set to the repo root automatically.
    - **Plain R / terminal:** start R from inside the repo folder.

@@ -123,7 +123,7 @@ p_plot <- ggplot(curve_df, aes(x = x, y = u)) +
            hjust = 1, vjust = -1, size = 6.4) +
   annotate("text", x = 0, y = u_y, label = "u(y)",
            hjust = 1.15, size = 6.6) +
-  annotate("text", x = x_max * 1.03, y = 0, label = "x",
+  annotate("text", x = x_max * 1.03, y = 0, label = "W",
            vjust = 1.8, hjust = 1, size = 8.2, fontface = "italic") +
   annotate("text", x = x_max, y = crra_utility(x_max, gamma), label = "u",
            colour = curve_col, vjust = -0.8, hjust = 0, size = 9,

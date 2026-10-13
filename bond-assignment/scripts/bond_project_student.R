@@ -1,16 +1,11 @@
 # ============================================================================
-# bond_project_simple.R -- Bond Project, example code for ALL QUESTIONS in the bond_project.pdf assignment
+# bond_project_student.R -- Bond Project, example code for ALL QUESTIONS in the bond_project.pdf assignment
 #
 # WHAT THIS SCRIPT DOES
 #   Q1  Reads daily bond PRICES for five bonds, and draws a line graph.
 #   Q2  Same for the YIELD TO MATURITY (YTM) of each bond.
-#   Q3  Computes a few numbers that help interpret the graphs: how prices and
-#       yields move together, and the largest one-day yield moves.
-#   Q4  Prices the United Airlines bond from its yield alone, by discounting
-#       its cash flows, and compares the answer to FactSet's quoted price.
 #   Q5  Builds a summary table of all five bonds on the last date, sorted by
 #       YTM, and a dot plot of the yields.
-#   Q6  Finds the two bonds whose maturity dates are closest together.
 #
 # HOW TO USE IT
 #   This code uses the instructor's five bonds. To use your own bonds:
@@ -227,3 +222,78 @@ p_yields <- ggplot(bond_panel, aes(date, ytm, colour = company)) +
   theme_bond
 ggsave(file.path(output_dir, "fig_q2_bond_yields.png"), p_yields, bg = "white",
        width = 9, height = 5.5, dpi = 300)
+
+# ---- 6. Question 5: summary table and ranked chart -------------------------
+## 6a. Summary table: one row per bond on the last date, lowest yield first.
+## Subtracting two dates gives the number of days between them; dividing by
+## 365.25 (the average year length, counting leap years) turns days into years.
+summary_tbl <- bond_panel |>
+  filter(date == last_date) |>                   # keep only the last date
+  mutate(years_to_maturity = as.numeric(maturity - last_date) / 365.25) |>
+  select(company, cusip, coupon_rate, maturity, years_to_maturity,
+         price, price_dollar, ytm) |>            # keep and order the columns
+  arrange(ytm)                                   # lowest YTM first
+
+## Print the table in the terminal. Only the printed copy is changed for
+## display: coupon_rate goes from a decimal (0.04625) to a percent (4.625),
+## and across() rounds several columns to 3 decimals in one step.
+## n = Inf prints every row instead of only the first 10.
+cat("\nQ5(a) summary at ", format(last_date, "%d %b %Y"), "\n", sep = "")
+print(summary_tbl |>
+        mutate(coupon_rate = coupon_rate * 100,
+               across(c(years_to_maturity, price, price_dollar, ytm),
+                      ~ round(.x, 3))), n = Inf)
+
+# A dot plot rather than a bar chart. The yields differ by only a few tenths
+# of a percentage point; bars must start at zero and would look identical.
+# Dots show position, so the axis can start near the data.
+ytm_range <- range(summary_tbl$ytm)
+p_rank <- ggplot(summary_tbl,
+                 aes(x = ytm, y = fct_reorder(company, ytm), colour = company)) +
+  geom_point(size = 5) +
+  geom_text(aes(label = sprintf("%.2f%%", ytm)), hjust = -0.55, size = 3.6,
+            colour = "grey20") +
+  scale_colour_manual(values = firm_palette, guide = "none") +
+  scale_x_continuous(labels = label_number(accuracy = 0.05, suffix = "%"),
+                     limits = c(ytm_range[1] - 0.06, ytm_range[2] + 0.10)) +
+  labs(title = "Twenty-seven basis points separate the highest yield from the lowest",
+       subtitle = paste("Yield to maturity, one bond per issuer, as of",
+                        format(last_date, "%d %B %Y")),
+       x = "Yield to maturity (%)", y = NULL,
+       caption = paste("Source: FactSet. Horizontal axis does not start at zero")) +
+  theme_bond
+ggsave(file.path(output_dir, "fig_q5_ytm_ranked.png"), p_rank, bg = "white",
+       width = 9, height = 4.8, dpi = 300)
+
+# ---- 7. Save tables --------------------------------------------------
+# The Q5 summary table is saved three times, in three formats:
+#   .csv  opens in Excel or Google Sheets
+#   .tex  for a LaTeX document or Beamer slides
+#   .md   for a Markdown document (also readable as plain text)
+
+## 7a. Make a presentable copy of the table.
+## transmute() keeps only the columns listed and renames them; names with
+## spaces or symbols need backticks (`...`). round(x, 2) keeps 2 decimals.
+## Coupon: 0.04625 becomes 4.625. Maturity: shown as e.g. 15 Apr 2029.
+q5_table <- summary_tbl |>
+  transmute(Company             = company,
+            CUSIP               = cusip,
+            `Coupon (%)`        = round(coupon_rate * 100, 3),
+            Maturity            = format(maturity, "%d %b %Y"),
+            `Years to maturity` = round(years_to_maturity, 2),
+            `Price (% face)`    = round(price, 3),
+            `Price ($)`         = round(price_dollar, 2),
+            `YTM (%)`           = round(ytm, 4))
+
+## 7b. Save as CSV.
+write_csv(q5_table, file.path(output_dir, "tab_q5_summary.csv"))
+
+## 7c. Save as LaTeX. kable() writes the table as text in the chosen format;
+## writeLines() saves that text to a file. booktabs = TRUE gives the clean
+## horizontal rules used in published tables.
+q5_latex <- kable(q5_table, format = "latex", booktabs = TRUE, linesep = "")
+writeLines(q5_latex, file.path(output_dir, "tab_q5_summary.tex"))
+
+## 7d. Save as Markdown ("pipe" is the Markdown table format).
+q5_markdown <- kable(q5_table, format = "pipe")
+writeLines(q5_markdown, file.path(output_dir, "tab_q5_summary.md"))
